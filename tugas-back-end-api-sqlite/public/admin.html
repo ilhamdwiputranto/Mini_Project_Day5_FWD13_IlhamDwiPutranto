@@ -1,0 +1,637 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Dashboard - Product CRUD Management</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      }
+
+      body {
+        background-color: #f4f6f9;
+        color: #333;
+        padding: 20px;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+        padding-bottom: 15px;
+        border-bottom: 2px solid #e2e8f0;
+      }
+
+      h1 {
+        color: #1e293b;
+        font-size: 24px;
+      }
+
+      .badge {
+        background-color: #3b82f6;
+        color: white;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 14px;
+      }
+
+      /* Card Layout */
+      .card {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        margin-bottom: 25px;
+      }
+
+      .card-title {
+        font-size: 18px;
+        font-weight: 600;
+        margin-bottom: 15px;
+        color: #0f172a;
+      }
+
+      /* Form Grid */
+      .form-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 15px;
+      }
+
+      .form-group {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .form-group.full-width {
+        grid-column: 1 / -1;
+      }
+
+      label {
+        font-size: 13px;
+        font-weight: 600;
+        margin-bottom: 5px;
+        color: #475569;
+      }
+
+      input,
+      select,
+      textarea {
+        padding: 10px;
+        border: 1px solid #cbd5e1;
+        border-radius: 6px;
+        font-size: 14px;
+        outline: none;
+        transition: border-color 0.2s;
+      }
+
+      input:focus,
+      select:focus,
+      textarea:focus {
+        border-color: #3b82f6;
+      }
+
+      textarea {
+        resize: vertical;
+        min-height: 80px;
+      }
+
+      .form-actions {
+        margin-top: 15px;
+        display: flex;
+        gap: 10px;
+      }
+
+      /* Buttons */
+      button {
+        padding: 10px 18px;
+        border: none;
+        border-radius: 6px;
+        font-weight: 600;
+        cursor: pointer;
+        font-size: 14px;
+        transition: background-color 0.2s;
+      }
+
+      .btn-primary {
+        background-color: #2563eb;
+        color: white;
+      }
+      .btn-primary:hover {
+        background-color: #1d4ed8;
+      }
+
+      .btn-secondary {
+        background-color: #64748b;
+        color: white;
+      }
+      .btn-secondary:hover {
+        background-color: #475569;
+      }
+
+      .btn-edit {
+        background-color: #eab308;
+        color: white;
+        padding: 6px 10px;
+        font-size: 12px;
+      }
+      .btn-edit:hover {
+        background-color: #ca8a04;
+      }
+
+      .btn-delete {
+        background-color: #ef4444;
+        color: white;
+        padding: 6px 10px;
+        font-size: 12px;
+      }
+      .btn-delete:hover {
+        background-color: #dc2626;
+      }
+
+      /* Table */
+      .table-responsive {
+        overflow-x: auto;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: left;
+      }
+
+      th,
+      td {
+        padding: 12px;
+        border-bottom: 1px solid #e2e8f0;
+        font-size: 14px;
+      }
+
+      th {
+        background-color: #f8fafc;
+        color: #475569;
+        font-weight: 600;
+      }
+
+      tr:hover {
+        background-color: #f1f5f9;
+      }
+
+      .product-img {
+        width: 45px;
+        height: 45px;
+        object-fit: cover;
+        border-radius: 4px;
+        background-color: #e2e8f0;
+      }
+
+      .json-tag {
+        display: inline-block;
+        background: #e0f2fe;
+        color: #0369a1;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-size: 11px;
+        font-family: monospace;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>🛒 Admin Product Dashboard</h1>
+        <span class="badge">SQLite Connected</span>
+      </header>
+
+      <!-- FORM INPUT & EDIT -->
+      <div class="card">
+        <div class="card-title" id="formTitle">➕ Tambah Produk Baru</div>
+        <form id="productForm">
+          <input type="hidden" id="productId" />
+
+          <div class="form-grid">
+            <!-- Mandatory Fields -->
+            <div class="form-group">
+              <label>Name (Wajib)</label>
+              <input type="text" id="name" required placeholder="Contoh: Kemeja Flannel" />
+            </div>
+
+            <div class="form-group">
+              <label>Nama Display Produk</label>
+              <input type="text" id="title" placeholder="Judul Tampilan Produk" />
+            </div>
+
+            <div class="form-group">
+              <label>Price ($) (Wajib)</label>
+              <input type="number" step="0.01" id="price" required placeholder="19.99" />
+            </div>
+
+            <div class="form-group">
+              <label>Category</label>
+              <input type="text" id="category" placeholder="fashion / electronics / skincare" />
+            </div>
+
+            <div class="form-group">
+              <label>Brand</label>
+              <input type="text" id="brand" placeholder="Nama Brand" />
+            </div>
+
+            <div class="form-group">
+              <label>SKU</label>
+              <input type="text" id="sku" placeholder="KODE-SKU-001" />
+            </div>
+
+            <div class="form-group">
+              <label>Stock</label>
+              <input type="number" id="stock" value="10" />
+            </div>
+
+            <div class="form-group">
+              <label>Discount (%)</label>
+              <input type="number" step="0.1" id="discountPercentage" value="0" />
+            </div>
+
+            <div class="form-group">
+              <label>Rating</label>
+              <input type="number" step="0.1" id="rating" value="4.5" />
+            </div>
+
+            <div class="form-group">
+              <label>Weight (gram)</label>
+              <input type="number" step="0.1" id="weight" value="200" />
+            </div>
+
+            <div class="form-group">
+              <label>Main Image URL</label>
+              <input type="url" id="image" placeholder="https://images.unsplash.com/..." />
+            </div>
+
+            <div class="form-group">
+              <label>Thumbnail URL</label>
+              <input type="url" id="thumbnail" placeholder="https://images.unsplash.com/..." />
+            </div>
+
+            <div class="form-group">
+              <label>Images Array</label>
+              <input type="text" id="images" placeholder="https://img1.jpg, https://img2.jpg" />
+            </div>
+
+            <div class="form-group">
+              <label>Availability Status</label>
+              <select id="availabilityStatus">
+                <option value="In Stock">In Stock</option>
+                <option value="Low Stock">Low Stock</option>
+                <option value="Out of Stock">Out of Stock</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Minimum Order Quantity</label>
+              <input type="number" id="minimumOrderQuantity" value="1" />
+            </div>
+
+            <div class="form-group">
+              <label>Warranty Information</label>
+              <input type="text" id="warrantyInformation" value="Garansi 7 hari" />
+            </div>
+
+            <div class="form-group">
+              <label>Shipping Information</label>
+              <input type="text" id="shippingInformation" value="Dikirim dalam 1-2 hari kerja" />
+            </div>
+
+            <div class="form-group">
+              <label>Return Policy</label>
+              <input type="text" id="returnPolicy" value="Garansi pengembalian barang" />
+            </div>
+
+            <!-- JSON Input Fields -->
+            <div class="form-group">
+              <label>Variants (JSON/String)</label>
+              <input type="text" id="variants" placeholder='{"colorOrSize": ["M","L"]}' />
+            </div>
+
+            <div class="form-group">
+              <label>Tags (Comma Separated)</label>
+              <input type="text" id="tags" placeholder="fashion, shirt, new" />
+            </div>
+
+            <div class="form-group">
+              <label>Dimensions (JSON)</label>
+              <input type="text" id="dimensions" placeholder='{"width": 10, "height": 5, "depth": 10}' />
+            </div>
+
+            <!-- Description -->
+            <div class="form-group full-width">
+              <label>Description</label>
+              <textarea id="description" placeholder="Deskripsi lengkap produk..."></textarea>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn-primary" id="btnSubmit">💾 Simpan Produk</button>
+            <button type="button" class="btn-secondary" id="btnCancel" style="display: none" onclick="resetForm()">Batal Edit</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- TABLE LIST PRODUCTS -->
+      <div class="card">
+        <div class="card-title">📦 Daftar Produk</div>
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Gambar</th>
+                <th>Nama</th>
+                <th>Kategori</th>
+                <th>Harga</th>
+                <th>Stok</th>
+                <th>Varian / Tags</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="productTableBody">
+              <tr>
+                <td colspan="8" style="text-align: center; color: #64748b">Memuat data dari database...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= START FLOATING BUTTON KEMBALI KE PORTAL ================= -->
+    <a
+      href="../../../landing_page_README_portal_projek.html"
+      title="Kembali ke Portal Utama"
+      style="
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        z-index: 99999;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: linear-gradient(135deg, #2563eb, #1d4ed8);
+        color: #ffffff;
+        text-decoration: none;
+        font-family: -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, sans-serif;
+        font-size: 14px;
+        font-weight: 600;
+        padding: 12px 20px;
+        border-radius: 50px;
+        box-shadow:
+          0 10px 25px -5px rgba(37, 99, 235, 0.5),
+          0 8px 10px -6px rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        cursor: pointer;
+      "
+      onmouseover="
+        this.style.transform = 'translateY(-4px) scale(1.03)';
+        this.style.boxShadow = '0 20px 30px -10px rgba(37, 99, 235, 0.6)';
+      "
+      onmouseout="
+        this.style.transform = 'translateY(0) scale(1)';
+        this.style.boxShadow = '0 10px 25px -5px rgba(37, 99, 235, 0.5)';
+      ">
+      <!-- Icon Arrow Left / Home -->
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="20"
+        height="20"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2.5"
+        stroke-linecap="round"
+        stroke-linejoin="round">
+        <path d="m12 19-7-7 7-7" />
+        <path d="M19 12H5" />
+      </svg>
+      <span>Kembali ke Portal</span>
+    </a>
+    <!-- ================= END FLOATING BUTTON KEMBALI KE PORTAL ================= -->
+
+    <script>
+      const API_URL = "http://localhost:3000/api/products";
+
+      // Fetch All Products on Page Load
+      document.addEventListener("DOMContentLoaded", fetchProducts);
+
+      // READ (Get All Products)
+      async function fetchProducts() {
+        try {
+          const response = await fetch(API_URL);
+          const products = await response.json();
+          renderTable(products);
+        } catch (err) {
+          console.error("Gagal mengambil data:", err);
+          document.getElementById("productTableBody").innerHTML = `
+          <tr><td colspan="8" style="text-align:center; color: red;">Gagal terhubung ke API Server! Pastikan backend running at http://localhost:3000.</td></tr>
+        `;
+        }
+      }
+
+      // Render Data to HTML Table
+      function renderTable(products) {
+        const tbody = document.getElementById("productTableBody");
+        if (!products || products.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="8" style="text-align: center;">Belum ada produk di database.</td></tr>`;
+          return;
+        }
+
+        tbody.innerHTML = products
+          .map((p) => {
+            const tagsList = Array.isArray(p.tags) ? p.tags.join(", ") : p.tags || "-";
+            const variantsInfo = typeof p.variants === "object" && p.variants !== null ? JSON.stringify(p.variants) : p.variants || "-";
+
+            return `
+          <tr>
+            <td><b>#${p.id}</b></td>
+            <td>
+              <img src="${p.image || p.thumbnail || "https://via.placeholder.com/45"}" class="product-img" alt="${p.name}">
+            </td>
+            <td>
+              <strong>${p.name}</strong><br>
+              <small style="color:#64748b;">SKU: ${p.sku || "-"}</small>
+            </td>
+            <td><span class="json-tag">${p.category || "General"}</span></td>
+            <td>$${parseFloat(p.price).toFixed(2)}</td>
+            <td>${p.stock ?? 0} pcs</td>
+            <td>
+              <small><b>Tags:</b> ${tagsList}</small><br>
+              <small><b>Var:</b> ${variantsInfo}</small>
+            </td>
+            <td>
+              <button class="btn-edit" onclick="editProduct(${p.id})">✏️ Edit</button>
+              <button class="btn-delete" onclick="deleteProduct(${p.id})">🗑️ Hapus</button>
+            </td>
+          </tr>
+        `;
+          })
+          .join("");
+      }
+
+      // CREATE & UPDATE Handler
+      document.getElementById("productForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const id = document.getElementById("productId").value;
+
+        // Formatting tags & images comma-separated input into Arrays
+        const rawTags = document.getElementById("tags").value;
+        const parsedTags = rawTags ? rawTags.split(",").map((t) => t.trim()) : [];
+
+        const rawImages = document.getElementById("images").value;
+        const parsedImages = rawImages ? rawImages.split(",").map((i) => i.trim()) : [];
+
+        // Safe JSON Parsing for variants and dimensions
+        let parsedVariants = null;
+        try {
+          const varInput = document.getElementById("variants").value;
+          if (varInput) parsedVariants = JSON.parse(varInput);
+        } catch (e) {
+          parsedVariants = document.getElementById("variants").value;
+        }
+
+        let parsedDimensions = null;
+        try {
+          const dimInput = document.getElementById("dimensions").value;
+          if (dimInput) parsedDimensions = JSON.parse(dimInput);
+        } catch (e) {
+          parsedDimensions = null;
+        }
+
+        const payload = {
+          name: document.getElementById("name").value,
+          price: parseFloat(document.getElementById("price").value),
+          title: document.getElementById("title").value || document.getElementById("name").value,
+          category: document.getElementById("category").value,
+          brand: document.getElementById("brand").value,
+          sku: document.getElementById("sku").value || `SKU-${Date.now()}`,
+          stock: parseInt(document.getElementById("stock").value) || 0,
+          discountPercentage: parseFloat(document.getElementById("discountPercentage").value) || 0,
+          rating: parseFloat(document.getElementById("rating").value) || 0,
+          weight: parseFloat(document.getElementById("weight").value) || 0,
+          image: document.getElementById("image").value,
+          thumbnail: document.getElementById("thumbnail").value,
+          availabilityStatus: document.getElementById("availabilityStatus").value,
+          minimumOrderQuantity: parseInt(document.getElementById("minimumOrderQuantity").value) || 1,
+          warrantyInformation: document.getElementById("warrantyInformation").value,
+          shippingInformation: document.getElementById("shippingInformation").value,
+          returnPolicy: document.getElementById("returnPolicy").value,
+          description: document.getElementById("description").value,
+          variants: parsedVariants,
+          tags: parsedTags,
+          dimensions: parsedDimensions,
+          images: parsedImages,
+        };
+
+        try {
+          let response;
+          if (id) {
+            // UPDATE (PUT)
+            response = await fetch(`${API_URL}/${id}`, {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(payload),
+            });
+          } else {
+            // CREATE (POST)
+            response = await fetch(API_URL, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(payload),
+            });
+          }
+
+          const result = await response.json();
+          alert(result.message || "Berhasil menyimpan data!");
+          resetForm();
+          fetchProducts();
+        } catch (err) {
+          alert("Gagal menyimpan data ke backend!");
+          console.error(err);
+        }
+      });
+
+      // Populate Form for EDIT
+      async function editProduct(id) {
+        try {
+          const res = await fetch(`${API_URL}/${id}`);
+          const p = await res.json();
+
+          document.getElementById("productId").value = p.id;
+          document.getElementById("name").value = p.name || "";
+          document.getElementById("price").value = p.price || "";
+          document.getElementById("title").value = p.title || "";
+          document.getElementById("category").value = p.category || "";
+          document.getElementById("brand").value = p.brand || "";
+          document.getElementById("sku").value = p.sku || "";
+          document.getElementById("stock").value = p.stock || 0;
+          document.getElementById("discountPercentage").value = p.discountPercentage || 0;
+          document.getElementById("rating").value = p.rating || 0;
+          document.getElementById("weight").value = p.weight || 0;
+          document.getElementById("image").value = p.image || "";
+          document.getElementById("thumbnail").value = p.thumbnail || "";
+          document.getElementById("availabilityStatus").value = p.availabilityStatus || "In Stock";
+          document.getElementById("minimumOrderQuantity").value = p.minimumOrderQuantity || 1;
+          document.getElementById("warrantyInformation").value = p.warrantyInformation || "";
+          document.getElementById("shippingInformation").value = p.shippingInformation || "";
+          document.getElementById("returnPolicy").value = p.returnPolicy || "";
+          document.getElementById("description").value = p.description || "";
+
+          document.getElementById("tags").value = Array.isArray(p.tags) ? p.tags.join(", ") : "";
+          document.getElementById("images").value = Array.isArray(p.images) ? p.images.join(", ") : "";
+          document.getElementById("variants").value = typeof p.variants === "object" ? JSON.stringify(p.variants) : p.variants || "";
+          document.getElementById("dimensions").value = typeof p.dimensions === "object" ? JSON.stringify(p.dimensions) : p.dimensions || "";
+
+          // Change UI state to EDIT
+          document.getElementById("formTitle").innerText = `✏️ Edit Produk #${p.id}`;
+          document.getElementById("btnSubmit").innerText = "💾 Perbarui Produk";
+          document.getElementById("btnCancel").style.display = "inline-block";
+
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        } catch (err) {
+          alert("Gagal mengambil data detail produk!");
+        }
+      }
+
+      // DELETE Product
+      async function deleteProduct(id) {
+        if (confirm(`Apakah kamu yakin ingin menghapus produk #${id}?`)) {
+          try {
+            const res = await fetch(`${API_URL}/${id}`, { method: "DELETE" });
+            const result = await res.json();
+            alert(result.message || "Produk berhasil dihapus!");
+            fetchProducts();
+          } catch (err) {
+            alert("Gagal menghapus produk!");
+          }
+        }
+      }
+
+      // Reset Form UI State
+      function resetForm() {
+        document.getElementById("productForm").reset();
+        document.getElementById("productId").value = "";
+        document.getElementById("formTitle").innerText = "➕ Tambah Produk Baru";
+        document.getElementById("btnSubmit").innerText = "💾 Simpan Produk";
+        document.getElementById("btnCancel").style.display = "none";
+      }
+    </script>
+  </body>
+</html>

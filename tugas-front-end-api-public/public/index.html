@@ -1,0 +1,632 @@
+<!doctype html>
+<html lang="id" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Project Day 5 Respond API - Dynamic Product Navigation</title>
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Google Fonts: Inter & Playfair Display -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap"
+      rel="stylesheet" />
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css" />
+
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              brand: {
+                bg: "#E5E5E5",
+                card: "#EBEBEB",
+                dark: "#0A0A0A",
+                border: "#D1D1D1",
+                green: "#2E7D32",
+                gold: "#D4AF37",
+              },
+            },
+            fontFamily: {
+              sans: ["Inter", "sans-serif"],
+              serif: ["Playfair Display", "serif"],
+            },
+          },
+        },
+      };
+    </script>
+  </head>
+  <body class="min-h-screen flex flex-col justify-between selection:bg-black selection:text-white">
+    <!-- Top Announcement Bar -->
+    <div class="bg-black text-white text-[10px] md:text-[11px] tracking-wider uppercase py-2 px-4 border-b border-gray-800">
+      <div class="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-2 text-center md:text-left">
+        <div class="w-full md:w-auto font-light">PICK YOUR FREE SAMPLES IN THE SHOPPING CART!</div>
+        <div class="hidden md:flex items-center space-x-6 font-light">
+          <span>SECURE ONLINE PAYMENTS</span>
+          <span>•</span>
+          <span>OFFICIAL ONLINE RETAILER</span>
+          <span>•</span>
+          <span class="flex items-center space-x-1">
+            <span>Trustpilot</span>
+            <span class="bg-[#00b67a] text-white px-1 py-0.5 rounded text-[9px]">★★★★★</span>
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Header Navigation -->
+    <header class="sticky top-0 z-40 bg-[#E5E5E5]/90 backdrop-blur-md border-b border-gray-300 transition-all duration-200">
+      <div class="max-w-7xl mx-auto px-4 md:px-8 py-4 flex items-center justify-between">
+        <!-- Mobile Menu Toggle Button -->
+        <button id="mobile-menu-btn" class="text-black hover:opacity-70 focus:outline-none p-1" aria-label="Open Navigation Menu">
+          <i class="fa-solid fa-bars text-xl"></i>
+        </button>
+
+        <!-- Brand Logo -->
+        <a href="#" class="flex items-center space-x-1">
+          <span class="serif-title text-2xl md:text-3xl font-bold tracking-tighter">50ml</span>
+        </a>
+
+        <!-- Action Buttons (Search, Account, Shopping Cart) -->
+        <div class="flex items-center space-x-5 text-lg">
+          <button id="search-btn" class="hover:opacity-60 transition" title="Search"><i class="fa-solid fa-magnifying-glass"></i></button>
+          <button id="user-btn" class="hover:opacity-60 transition hidden sm:inline-block" title="User Account">
+            <i class="fa-regular fa-user"></i>
+          </button>
+          <button id="cart-btn" class="hover:opacity-60 transition relative" title="Shopping Cart">
+            <i class="fa-solid fa-bag-shopping"></i>
+            <span
+              id="cart-badge"
+              class="absolute -top-2 -right-2 bg-black text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center font-bold"
+              >0</span
+            >
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 md:px-8 py-6 md:py-12">
+      <!-- Live API Status Notification Banner & Controls -->
+      <div
+        id="api-status-banner"
+        class="mb-6 p-3.5 bg-blue-50 border border-blue-200 rounded-xl text-xs text-blue-900 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-sm transition-all duration-300">
+        <span id="api-status-text" class="flex items-center">
+          <i class="fa-solid fa-spinner fa-spin text-blue-600 text-sm mr-2.5"></i>
+          <span>Mengambil data produk live dari <strong>DummyJSON API</strong>...</span>
+        </span>
+        <div class="flex items-center space-x-2">
+          <span class="text-[11px] font-semibold text-gray-600">ID Produk:</span>
+          <input
+            type="number"
+            id="direct-id-input"
+            min="1"
+            max="194"
+            value="1"
+            class="w-16 px-2 py-1 bg-white border border-gray-300 rounded text-center text-xs font-bold text-black focus:outline-none focus:border-black" />
+          <button id="btn-jump-id" class="bg-black text-white px-3 py-1 rounded text-xs hover:bg-gray-800 transition">Go</button>
+          <button onclick="document.getElementById('api-status-banner').classList.add('hidden')" class="text-blue-500 hover:text-black ml-2">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
+        <!-- Left Column: Product Gallery Showcase with Navigation Buttons -->
+        <!-- BACK / PREVIOUS PRODUCT BUTTON -->
+        <button
+          id="btn-prev-product"
+          class="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-black hover:text-white text-black p-3 rounded-full shadow-md z-20 transition-all duration-200 focus:outline-none disabled:opacity-30 disabled:cursor-not-allowed group/btn"
+          title="Produk Sebelumnya (Back)">
+          <i class="fa-solid fa-chevron-left text-sm md:text-base transition-transform group-hover/btn:-translate-x-0.5"></i>
+        </button>
+        <div
+          class="lg:col-span-7 flex flex-col items-center justify-center bg-[#E0E0E0] rounded-2xl p-6 md:p-8 relative border border-gray-300 shadow-inner group">
+          <span
+            id="product-badge"
+            class="absolute top-4 left-4 bg-black text-white text-[10px] uppercase tracking-widest px-3 py-1 rounded-full z-10 font-medium opacity-0 transition-opacity duration-300">
+            Diskon %
+          </span>
+
+          <!-- Main Featured Product Image with Skeleton Loader -->
+          <div id="image-container" class="w-full max-w-md aspect-square flex items-center justify-center relative rounded-xl overflow-hidden">
+            <div id="image-skeleton" class="w-full h-full skeleton rounded-xl absolute inset-0"></div>
+            <img
+              id="main-product-img"
+              src=""
+              alt="Product Showcase"
+              class="max-h-full max-w-full object-contain rounded-lg drop-shadow-xl opacity-0 transition-opacity duration-500 z-10" />
+          </div>
+
+          <!-- Gallery Thumbnails Slider -->
+          <div id="gallery-thumbnails" class="flex space-x-3 mt-6 overflow-x-auto w-full justify-center py-2">
+            <!-- Dynamic Thumbnails Rendered Here -->
+          </div>
+        </div>
+
+        <!-- Right Column: Product Metadata & Purchasing Options -->
+
+        <!-- NEXT PRODUCT BUTTON -->
+        <button
+          id="btn-next-product"
+          class="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-black hover:text-white text-black p-3 rounded-full shadow-md z-20 transition-all duration-200 focus:outline-none disabled:opacity-30 disabled:cursor-not-allowed group/btn"
+          title="Produk Selanjutnya (Next)">
+          <i class="fa-solid fa-chevron-right text-sm md:text-base transition-transform group-hover/btn:translate-x-0.5"></i>
+        </button>
+        <div class="lg:col-span-5 space-y-6">
+          <!-- Brand & Title Header Block -->
+          <div class="border-b border-gray-300 pb-4 space-y-2">
+            <div id="brand-skeleton" class="w-24 h-4 skeleton rounded"></div>
+            <span id="product-brand" class="text-xs uppercase tracking-widest text-gray-500 font-bold hidden">BRAND</span>
+
+            <div id="title-skeleton" class="w-3/4 h-8 skeleton rounded my-2"></div>
+            <h1 id="product-title" class="serif-title text-3xl md:text-4xl font-bold tracking-tight text-black hidden">Product Title</h1>
+
+            <p id="product-subtitle" class="text-xs md:text-sm text-gray-600 italic">loading details...</p>
+
+            <!-- Rating & Stock Info Bar -->
+            <div class="flex items-center justify-between pt-2">
+              <div class="flex items-center space-x-2">
+                <div id="product-stars-container" class="text-amber-500 text-xs flex">
+                  <i class="fa-solid fa-star text-gray-300"></i>
+                </div>
+                <span id="product-rating-text" class="text-xs text-gray-500 font-medium">(0.0)</span>
+              </div>
+              <span id="stock-status" class="text-xs font-semibold text-brand-green flex items-center">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block mr-1.5 animate-pulse"></span>
+                Checking Stock...
+              </span>
+            </div>
+          </div>
+
+          <!-- Dynamic Pricing Block (Original Price + Discount Calculation) -->
+          <div class="space-y-1">
+            <div class="flex items-baseline space-x-3">
+              <span id="product-price" class="text-3xl font-semibold text-black">$0.00</span>
+              <span id="product-old-price" class="text-sm text-gray-400 line-through hidden">$0.00</span>
+              <span id="discount-badge" class="bg-red-100 text-red-700 text-[11px] font-bold px-2 py-0.5 rounded hidden"> 0% OFF </span>
+            </div>
+            <p id="vat-notice" class="text-[10px] text-gray-500">Termasuk pajak & garansi resmi online retailer.</p>
+          </div>
+
+          <!-- Capacity Selection Pills -->
+          <!-- <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-gray-700 mb-2">Capacity:</label>
+                    <div class="flex space-x-3">
+                        <button type="button" class="capacity-pill px-5 py-2 text-xs font-medium border-2 rounded-full transition-all duration-200 border-black bg-black text-white shadow-sm" data-capacity="50 ml" data-multiplier="1.0">
+                            50 ml
+                        </button>
+                        <button type="button" class="capacity-pill px-5 py-2 text-xs font-medium border-2 rounded-full transition-all duration-200 border-gray-400 bg-transparent text-gray-800 hover:border-black" data-capacity="100 ml" data-multiplier="1.6">
+                            100 ml
+                        </button>
+                    </div>
+                </div> -->
+
+          <!-- Quantity Counter & Add To Cart Button -->
+          <div class="space-y-3 pt-2">
+            <label class="block text-xs font-semibold uppercase tracking-wider text-gray-700">Quantity & Add:</label>
+            <div class="flex items-center space-x-3">
+              <!-- Quantity Counter -->
+              <div class="flex items-center border border-gray-400 rounded-full bg-white/50 px-3 py-2">
+                <button
+                  id="btn-minus"
+                  class="w-7 h-7 flex items-center justify-center text-gray-600 hover:text-black disabled:opacity-30 disabled:cursor-not-allowed transition"
+                  aria-label="Decrease Quantity">
+                  <i class="fa-solid fa-minus text-xs"></i>
+                </button>
+                <span id="qty-val" class="w-10 text-center font-medium text-sm">1</span>
+                <button
+                  id="btn-plus"
+                  class="w-7 h-7 flex items-center justify-center text-gray-600 hover:text-black transition"
+                  aria-label="Increase Quantity">
+                  <i class="fa-solid fa-plus text-xs"></i>
+                </button>
+              </div>
+
+              <!-- Add To Cart Primary Button -->
+              <button
+                id="btn-add-to-cart"
+                class="flex-grow bg-black hover:bg-gray-800 text-white text-xs uppercase tracking-widest font-semibold py-3.5 px-6 rounded-full transition-all duration-200 shadow-md active:scale-95 flex items-center justify-center space-x-2">
+                <i class="fa-solid fa-bag-shopping"></i>
+                <span>ADD TO CART</span>
+              </button>
+
+              <!-- Wishlist Toggle Button -->
+              <button
+                id="btn-wishlist"
+                class="p-3 border border-gray-400 hover:border-black rounded-full transition-all duration-200 text-gray-700 hover:text-red-500"
+                title="Add to Wishlist">
+                <i class="fa-regular fa-heart text-base"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Dynamic Accordions Collapsible Section -->
+          <div class="border-t border-gray-300 pt-4 space-y-2">
+            <!-- Description Accordion -->
+            <div class="accordion-item border-b border-gray-300 pb-3 active">
+              <button class="accordion-header w-full flex justify-between items-center py-2 text-left focus:outline-none" aria-expanded="true">
+                <span class="text-xs font-bold uppercase tracking-widest text-black">DESCRIPTION</span>
+                <span class="accordion-icon transition-transform duration-300 text-lg font-light text-black">+</span>
+              </button>
+              <div class="accordion-content text-xs text-gray-600 leading-relaxed space-y-2 pt-2">
+                <p id="accordion-desc-text">Memuat deskripsi produk dari API...</p>
+              </div>
+            </div>
+
+            <!-- More Information Accordion (Shipping, Warranty, Returns from API) -->
+            <div class="accordion-item border-b border-gray-300 pb-3">
+              <button class="accordion-header w-full flex justify-between items-center py-2 text-left focus:outline-none" aria-expanded="false">
+                <span class="text-xs font-bold uppercase tracking-widest text-black">MORE INFORMATION</span>
+                <span class="accordion-icon transition-transform duration-300 text-lg font-light text-black">+</span>
+              </button>
+              <div class="accordion-content text-xs text-gray-600 leading-relaxed space-y-2 pt-2">
+                <ul class="space-y-1.5">
+                  <li><strong>Warranty Info:</strong> <span id="info-warranty">-</span></li>
+                  <li><strong>Shipping Info:</strong> <span id="info-shipping">-</span></li>
+                  <li><strong>Return Policy:</strong> <span id="info-return">-</span></li>
+                  <li><strong>Minimum Order Qty:</strong> <span id="info-min-order">1 Item</span></li>
+                </ul>
+              </div>
+            </div>
+
+            <!-- Features & Specifications Accordion -->
+            <div class="accordion-item border-b border-gray-300 pb-3">
+              <button class="accordion-header w-full flex justify-between items-center py-2 text-left focus:outline-none" aria-expanded="false">
+                <span class="text-xs font-bold uppercase tracking-widest text-black">FEATURES & SPECS</span>
+                <span class="accordion-icon transition-transform duration-300 text-lg font-light text-black">+</span>
+              </button>
+              <div class="accordion-content text-xs text-gray-600 leading-relaxed space-y-1 pt-2">
+                <p>• <strong>Product ID / SKU:</strong> <span id="info-sku">-</span></p>
+                <p>• <strong>Category:</strong> <span id="info-category">-</span></p>
+                <p>• <strong>Stock Availability:</strong> <span id="info-stock-count">-</span> units left</p>
+                <p>• <strong>Rating Score:</strong> <span id="info-rating-score">-</span> / 5.0</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Service Highlights / Badges -->
+          <div class="grid grid-cols-3 gap-2 pt-4 text-center border-t border-gray-300">
+            <div class="p-2 flex flex-col items-center">
+              <i class="fa-solid fa-paper-plane text-gray-700 text-lg mb-1"></i>
+              <span class="text-[10px] uppercase font-bold tracking-tight text-gray-800 leading-tight">FREE SHIPPING FROM $150</span>
+            </div>
+            <div class="p-2 flex flex-col items-center border-x border-gray-300">
+              <i class="fa-solid fa-flask text-gray-700 text-lg mb-1"></i>
+              <span class="text-[10px] uppercase font-bold tracking-tight text-gray-800 leading-tight">FREE SAMPLE UPON REQUEST</span>
+            </div>
+            <div class="p-2 flex flex-col items-center">
+              <i class="fa-regular fa-credit-card text-gray-700 text-lg mb-1"></i>
+              <span class="text-[10px] uppercase font-bold tracking-tight text-gray-800 leading-tight">BUY NOW, PAY LATER WITH KLARNA & PAYPAL</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Product Review Section -->
+      <section class="mt-16 md:mt-24 border-t border-gray-300 pt-12 max-w-4xl mx-auto">
+        <div class="mb-8 text-center">
+          <span class="text-xs font-bold uppercase tracking-widest text-gray-500">SHARE YOUR THOUGHTS</span>
+          <h2 class="serif-title text-2xl md:text-3xl font-bold text-black mt-1">
+            You're reviewing: <span id="review-target-name" class="underline decoration-1 italic">...</span>
+          </h2>
+        </div>
+
+        <!-- Interactive Review Form -->
+        <form id="review-form" class="bg-[#E0E0E0]/60 p-6 md:p-10 rounded-2xl border border-gray-300 space-y-6 shadow-sm">
+          <!-- Interactive Star Rating Picker -->
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-gray-700 mb-2"
+              >Your Rating <span class="text-red-500">*</span></label
+            >
+            <div id="star-picker" class="star-rating flex items-center space-x-2 text-xl text-gray-400">
+              <i class="fa-regular fa-star" data-rating="1"></i>
+              <i class="fa-regular fa-star" data-rating="2"></i>
+              <i class="fa-regular fa-star" data-rating="3"></i>
+              <i class="fa-regular fa-star" data-rating="4"></i>
+              <i class="fa-regular fa-star" data-rating="5"></i>
+            </div>
+            <p id="rating-error" class="text-[11px] text-red-600 hidden mt-1">Please select a star rating.</p>
+          </div>
+
+          <!-- Nickname Input -->
+          <div>
+            <label for="review-nickname" class="block text-xs font-semibold uppercase tracking-wider text-gray-700 mb-1"
+              >Nickname <span class="text-red-500">*</span></label
+            >
+            <input
+              type="text"
+              id="review-nickname"
+              class="w-full bg-white/80 border border-gray-300 rounded-lg px-4 py-2.5 text-xs focus:outline-none focus:border-black transition"
+              placeholder="Enter your nickname" />
+            <p id="nickname-error" class="text-[11px] text-red-600 hidden mt-1">Nickname is required.</p>
+          </div>
+
+          <!-- Summary Input -->
+          <div>
+            <label for="review-summary" class="block text-xs font-semibold uppercase tracking-wider text-gray-700 mb-1"
+              >Summary <span class="text-red-500">*</span></label
+            >
+            <input
+              type="text"
+              id="review-summary"
+              class="w-full bg-white/80 border border-gray-300 rounded-lg px-4 py-2.5 text-xs focus:outline-none focus:border-black transition"
+              placeholder="e.g. Excellent texture and luxurious feel" />
+            <p id="summary-error" class="text-[11px] text-red-600 hidden mt-1">Summary is required.</p>
+          </div>
+
+          <!-- Review Textarea -->
+          <div>
+            <label for="review-body" class="block text-xs font-semibold uppercase tracking-wider text-gray-700 mb-1"
+              >Review <span class="text-red-500">*</span></label
+            >
+            <textarea
+              id="review-body"
+              rows="4"
+              class="w-full bg-white/80 border border-gray-300 rounded-lg px-4 py-2.5 text-xs focus:outline-none focus:border-black transition"
+              placeholder="Write your full review here..."></textarea>
+            <p id="body-error" class="text-[11px] text-red-600 hidden mt-1">Review text is required.</p>
+          </div>
+
+          <!-- Submit Button -->
+          <div class="pt-2">
+            <button
+              type="submit"
+              class="bg-black hover:bg-gray-800 text-white text-xs uppercase tracking-widest font-semibold px-8 py-3.5 rounded-full transition duration-200 shadow">
+              SUBMIT REVIEW
+            </button>
+            <p class="text-[10px] text-gray-500 mt-3 leading-tight">
+              This form is protected by reCAPTCHA - Google <a href="#" class="underline">Privacy Policy</a> and
+              <a href="#" class="underline">Terms of Service</a> apply.
+            </p>
+          </div>
+        </form>
+
+        <!-- Dynamic Customer Reviews Listing -->
+        <div class="mt-12 space-y-4">
+          <div class="flex items-center justify-between border-b border-gray-300 pb-3">
+            <h3 class="text-sm font-bold uppercase tracking-wider text-black">Customer Reviews (<span id="reviews-count-badge">0</span>)</h3>
+            <span id="reviews-avg-text" class="text-xs text-gray-500 font-medium">Rating: 0 / 5.0</span>
+          </div>
+
+          <div id="reviews-list" class="space-y-4">
+            <!-- Dynamic Reviews Rendered via JS -->
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer Section -->
+    <footer class="bg-brand-dark text-white pt-16 pb-8 border-t border-gray-800 mt-20">
+      <div class="max-w-7xl mx-auto px-4 md:px-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-10 pb-12 border-b border-gray-800">
+          <!-- Col 1: Brand Summary & Payment Logos -->
+          <div class="lg:col-span-4 space-y-6">
+            <span class="serif-title text-3xl font-bold tracking-tight block">50ml</span>
+            <p class="text-xs text-gray-400 leading-relaxed pr-4">
+              50ml is where humanity and trust meet the convenience of shopping online. We want to share our passion for niche products, from perfumes
+              to cosmetics, and provide an extraordinary beauty experience.
+            </p>
+
+            <div class="space-y-3 pt-2">
+              <span class="text-[10px] font-bold tracking-widest text-gray-500 uppercase block">LOGISTICS & PAYMENT PARTNERS</span>
+              <div class="flex flex-wrap gap-3 text-gray-400 text-lg items-center">
+                <i class="fa-brands fa-cc-visa hover:text-white transition" title="Visa"></i>
+                <i class="fa-brands fa-cc-mastercard hover:text-white transition" title="Mastercard"></i>
+                <i class="fa-brands fa-cc-paypal hover:text-white transition" title="PayPal"></i>
+                <i class="fa-brands fa-cc-apple-pay hover:text-white transition" title="Apple Pay"></i>
+                <i class="fa-brands fa-google-pay hover:text-white transition" title="Google Pay"></i>
+                <span class="text-xs border border-gray-700 px-1.5 py-0.5 rounded text-gray-300 font-mono">InPost</span>
+                <span class="text-xs border border-gray-700 px-1.5 py-0.5 rounded text-gray-300 font-mono">TNT</span>
+                <span class="text-xs border border-gray-700 px-1.5 py-0.5 rounded text-gray-300 font-mono">FedEx</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Col 2: Newsletter Subscription Form -->
+          <div class="lg:col-span-4 space-y-4">
+            <h3 class="text-xs font-bold uppercase tracking-widest text-white">Subscribe to Newsletter</h3>
+            <p class="text-xs text-gray-400">Stay updated! Sign up for our newsletter to get exclusive offers and niche beauty releases.</p>
+
+            <form id="newsletter-form" class="space-y-3">
+              <div class="flex">
+                <input
+                  type="email"
+                  id="newsletter-email"
+                  placeholder="Your email address"
+                  class="bg-gray-900 border border-gray-700 text-xs text-white px-3.5 py-2.5 rounded-l-md w-full focus:outline-none focus:border-white transition"
+                  required />
+                <button
+                  type="submit"
+                  class="bg-white text-black text-xs font-bold uppercase tracking-wider px-4 py-2.5 rounded-r-md hover:bg-gray-200 transition">
+                  SUBSCRIBE
+                </button>
+              </div>
+              <div class="flex items-start space-x-2">
+                <input type="checkbox" id="newsletter-privacy" class="mt-0.5 rounded bg-gray-900 border-gray-700 text-black focus:ring-0" />
+                <label for="newsletter-privacy" class="text-[10px] text-gray-400 leading-tight">
+                  I declare that I have read and understood the privacy policy, I consent to the processing of my personal data for marketing
+                  purposes. <a href="#" class="underline">read more</a>
+                </label>
+              </div>
+            </form>
+          </div>
+
+          <!-- Col 3: Navigation Grid -->
+          <div class="lg:col-span-4 grid grid-cols-2 gap-6">
+            <div>
+              <h4 class="text-xs font-bold uppercase tracking-widest text-white mb-4">ABOUT 50ML</h4>
+              <ul class="space-y-2 text-xs text-gray-400">
+                <li><a href="#" class="hover:text-white transition">About Us</a></li>
+                <li><a href="#" class="hover:text-white transition">Boutique</a></li>
+                <li><a href="#" class="hover:text-white transition">Orders and Returns</a></li>
+                <li><a href="#" class="hover:text-white transition">Become our affiliate</a></li>
+                <li><a href="#" class="hover:text-white transition">Trustpilot Reviews</a></li>
+              </ul>
+            </div>
+            <div>
+              <h4 class="text-xs font-bold uppercase tracking-widest text-white mb-4">ONLINE SHOPPING</h4>
+              <ul class="space-y-2 text-xs text-gray-400">
+                <li><a href="#" class="hover:text-white transition">Gift Card</a></li>
+                <li><a href="#" class="hover:text-white transition">FAQ & Help Center</a></li>
+                <li><a href="#" class="hover:text-white transition">Terms and Conditions</a></li>
+                <li><a href="#" class="hover:text-white transition">Privacy Policy</a></li>
+                <li><a href="#" class="hover:text-white transition">Contact Us</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Top Brands Directory Grid -->
+        <div class="py-8 border-b border-gray-800">
+          <h4 class="text-[11px] font-bold uppercase tracking-widest text-gray-500 mb-4">TOP BRANDS</h4>
+          <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-x-4 gap-y-2 text-[11px] text-gray-400">
+            <a href="#" class="hover:text-white transition">Aesop</a>
+            <a href="#" class="hover:text-white transition">Amouage</a>
+            <a href="#" class="hover:text-white transition">Byredo</a>
+            <a href="#" class="hover:text-white transition">Creed</a>
+            <a href="#" class="hover:text-white transition">Diptyque</a>
+            <a href="#" class="hover:text-white transition">Innoxa</a>
+            <a href="#" class="hover:text-white transition">Kilian</a>
+            <a href="#" class="hover:text-white transition">Maison Margiela</a>
+            <a href="#" class="hover:text-white transition">Nishane</a>
+            <a href="#" class="hover:text-white transition">Orto Parisi</a>
+            <a href="#" class="hover:text-white transition">Parfums de Marly</a>
+            <a href="#" class="hover:text-white transition">Penhaligon's</a>
+            <a href="#" class="hover:text-white transition">Tom Ford</a>
+            <a href="#" class="hover:text-white transition">Xerjoff</a>
+          </div>
+        </div>
+
+        <!-- Copyright Notice -->
+        <div class="pt-8 flex flex-col md:flex-row justify-between items-center text-[10px] text-gray-500 gap-2">
+          <p>©2026 Fast Ventures srl | Via Paolo Frisi 3, 20139, Milano | P.IVA/C.F. 08395780961 | Equity 50,000 €</p>
+          <div class="flex space-x-4">
+            <a href="#" class="hover:underline">Cookie Policy</a>
+            <a href="#" class="hover:underline">Legal Notes</a>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Cart Drawer Slide-Over Modal -->
+    <div id="cart-drawer-backdrop" class="fixed inset-0 bg-black/50 z-50 hidden transition-opacity duration-300 opacity-0"></div>
+    <div
+      id="cart-drawer"
+      class="fixed top-0 right-0 h-full w-full max-w-md bg-white z-50 shadow-2xl transform translate-x-full transition-transform duration-300 flex flex-col justify-between">
+      <div class="p-6 border-b border-gray-200 flex items-center justify-between">
+        <h3 class="serif-title text-lg font-bold text-black">Your Shopping Cart</h3>
+        <button id="close-cart-btn" class="text-gray-500 hover:text-black p-1"><i class="fa-solid fa-xmark text-xl"></i></button>
+      </div>
+
+      <div id="cart-items-container" class="p-6 flex-grow overflow-y-auto space-y-4">
+        <p id="empty-cart-msg" class="text-xs text-gray-500 text-center py-8">Your cart is currently empty.</p>
+      </div>
+
+      <div class="p-6 border-t border-gray-200 bg-gray-50 space-y-4">
+        <div class="flex justify-between items-center text-sm font-semibold">
+          <span>Subtotal:</span>
+          <span id="cart-subtotal">$0.00</span>
+        </div>
+        <button class="w-full bg-black text-white text-xs uppercase tracking-widest font-bold py-3.5 rounded-full hover:bg-gray-800 transition">
+          PROCEED TO CHECKOUT
+        </button>
+      </div>
+    </div>
+
+    <!-- Search Modal Overlay -->
+    <div id="search-modal" class="fixed inset-0 bg-black/70 z-50 hidden items-center justify-center p-4">
+      <div class="bg-white rounded-2xl p-6 w-full max-w-lg space-y-4 shadow-2xl relative">
+        <button id="close-search-btn" class="absolute top-4 right-4 text-gray-500 hover:text-black"><i class="fa-solid fa-xmark text-lg"></i></button>
+        <h3 class="serif-title text-xl font-bold text-black">Search 50ml Products</h3>
+        <div class="flex items-center border border-gray-300 rounded-lg px-3 py-2">
+          <i class="fa-solid fa-magnifying-glass text-gray-400 mr-2"></i>
+          <input type="text" id="search-input" placeholder="Type product name, brand, category..." class="w-full text-xs focus:outline-none" />
+        </div>
+        <div id="search-results" class="text-xs text-gray-500 pt-2 max-h-40 overflow-y-auto space-y-2">
+          <p>
+            Popular searches:
+            <span class="text-black font-medium underline cursor-pointer" onclick="document.getElementById('search-input').value = 'Essence'"
+              >Essence</span
+            >,
+            <span class="text-black font-medium underline cursor-pointer" onclick="document.getElementById('search-input').value = 'Beauty'"
+              >Beauty</span
+            >
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div
+      id="toast"
+      class="fixed bottom-6 right-6 z-50 bg-black text-white px-5 py-3.5 rounded-lg shadow-2xl flex items-center space-x-3 text-xs border border-gray-700">
+      <i id="toast-icon" class="fa-solid fa-circle-check text-emerald-400 text-base"></i>
+      <span id="toast-message">Notification message here.</span>
+    </div>
+
+    <!-- ================= START FLOATING BUTTON KEMBALI KE PORTAL ================= -->
+    <a
+      href="../../landing_page_README_portal_projek.html"
+      title="Kembali ke Portal Utama"
+      style="
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        z-index: 99999;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: linear-gradient(135deg, #2563eb, #1d4ed8);
+        color: #ffffff;
+        text-decoration: none;
+        font-family: -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, sans-serif;
+        font-size: 14px;
+        font-weight: 600;
+        padding: 12px 20px;
+        border-radius: 50px;
+        box-shadow:
+          0 10px 25px -5px rgba(37, 99, 235, 0.5),
+          0 8px 10px -6px rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        cursor: pointer;
+      "
+      onmouseover="
+        this.style.transform = 'translateY(-4px) scale(1.03)';
+        this.style.boxShadow = '0 20px 30px -10px rgba(37, 99, 235, 0.6)';
+      "
+      onmouseout="
+        this.style.transform = 'translateY(0) scale(1)';
+        this.style.boxShadow = '0 10px 25px -5px rgba(37, 99, 235, 0.5)';
+      ">
+      <!-- Icon Arrow Left / Home -->
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="20"
+        height="20"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2.5"
+        stroke-linecap="round"
+        stroke-linejoin="round">
+        <path d="m12 19-7-7 7-7" />
+        <path d="M19 12H5" />
+      </svg>
+      <span>Kembali ke Portal</span>
+    </a>
+    <!-- ================= END FLOATING BUTTON KEMBALI KE PORTAL ================= -->
+
+    <!-- Custom Script -->
+    <script src="script.js"></script>
+  </body>
+</html>
