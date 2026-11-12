@@ -1,126 +1,137 @@
-# Portal Portfolio & Dokumentasi Projek (DAY - 5 Mini Project)
+# Mini Project Full-Stack: Building Interactivity Website with JavaScript (Day 22)
 
- Selamat datang di repositori **Portal Portfolio & Dokumentasi Projek** yang dikembangkan oleh **Ilham Dwi Putranto**. Projek ini dikerjakan sebagai bagian dari program **Full-Stack Web Development (AI First Workflow)**.
+Proyek ini merupakan kelanjutan dari **Study Case Phase 1** dengan menambahkan interaktivitas dinamis menggunakan JavaScript (DOM manipulation, _event handling_, validasi _input_, serta _asynchronous JavaScript_ menggunakan Fetch API) pada dua halaman detail produk e-commerce **50ml**.
 
 ---
 
 ## 👤 Profil Developer
 
-* **Nama:** Ilham Dwi Putranto
-* **Kelas:** Full-Stack Web Development
-* **Spesialisasi:** AI-First Web Development
-* **GitHub:** [ilhamdwiputranto](https://github.com/ilhamdwiputranto)
-* **LinkedIn:** [Ilham Dwi Putranto](https://www.linkedin.com/in/ilham-dwi-putranto)
+- **Nama:** Ilham Dwi Putranto
+- **Kelas:** Full-Stack Web Development
+- **GitHub:** [ilhamdwiputranto](https://github.com/ilhamdwiputranto)
+- **LinkedIn:** [Ilham Dwi Putranto](https://www.linkedin.com/in/ilham-dwi-putranto)
 
 ---
 
-## 💡 Kesan & Vibes Coding (1 Minggu Awal)
+## 1. Struktur Folder & Halaman
 
-Mengikuti kelas penggunaan AI pada project web development selama satu minggu pertama memberikan pengalaman baru yang signifikan. Fokus utama bukan lagi penulisan kode per baris (*line-by-line coding*), melainkan pengarahan logika, arsitektur, dan konsep dengan bantuan AI. Interaksi yang intensif dengan AI memungkinkan proses penerjemahan ide menjadi prototipe web berjalan dengan sangat cepat dan efisien.
+Sesuai dengan struktur _repository_, proyek ini mempertahankan dua checkpoint halaman detail produk dari Phase 1 yang terpisah ke dalam dua folder:
 
-Selama satu minggu awal belajar, berbagai hasil konkret telah berhasil dicapai, mulai dari penyusunan struktur kode yang lebih rapi hingga implementasi fitur-fitur kompleks. AI terbukti mempercepat proses, memberikan rekomendasi optimasi kode, serta menyediakan alternatif solusi teknis saat menghadapi hambatan. Efisiensi waktu yang diperoleh memungkinkan perhatian lebih banyak dicurahkan pada validasi ide, alur pengguna, dan kualitas produk secara keseluruhan.
-
-> **Pendapat tentang Vibe Coding:**
-> *Vibe coding* tidak menghilangkan kebutuhan akan pemahaman pemrograman dasar, melainkan mengubah peran pengembang menjadi seorang pengarah (*director*) yang memandu AI untuk mewujudkan visi produk. Hal ini membuat proses pengembangan web terasa lebih adaptif, menyenangkan, dan inklusif.
-
----
-
-## 🚀 Langkah-Langkah Pengerjaan Projek
-
-| Langkah | Deskripsi | Kesan Pengerjaan |
-| :--- | :--- | :--- |
-| **01. Memahami Perintah Proyek** | Menganalisis instruksi tugas, sasaran utama, dan batasan arsitektur. | *Saya memahami bagian ini.* |
-| **02. Menyusun Langkah Pengerjaan** | Merencanakan alur teknis, struktur folder, serta strategi pemecahan masalah. | *Saya memahami bagian ini.* |
-| **03. Membuat PRD** | Menyusun Product Requirement Document sebagai acuan spesifikasi fitur. | *Saya memahami bagian ini.* |
-| **04. Membuat Markdown Docs** | Menyusun `requirement.md`, `design.md`, dan `task.md`. | *Saya memahami bagian ini.* |
-| **05. Mengeksekusi Penulisan Program** | Pengodean komponen frontend dan endpoint backend berbasis AI First. | *Saya sangat hati-hati dalam mengeksekusi ini.* |
-| **06. Analisis Program** | Pengujian fitur, verifikasi integritas data, serta pemeriksaan bug/error. | *Saya tetap perlu memahami baris-baris hasil.* |
-| **07. Merapikan Program** | Refactoring kode, pengorganisasian subfolder public, dan pembersihan file. | *Saya membuang yang tidak diperlukan dan menambahkan fitur yang diperlukan.* |
-| **08. Submit Program** | Finalisasi repositori, pembuatan landing page portal, dan penyerahan tugas. | *Semoga hasilnya memuaskan.* |
-
----
-
-## 🛠️ Tools & Infrastruktur
-
-1. **Gemini & GPT AI** — Asisten pemikiran utama untuk merancang arsitektur, drafting kode, dan debugging.
-2. **VS Code** — Code editor utama tempat eksekusi penulisan program dan manajemen folder.
-3. **Google Docs** — Media pencatatan draft PRD, ideasi cepat, dan pengorganisasian materi awal.
-4. **Google Search** — Eksplorasi referensi dokumentasi sintaks, riset pustaka, dan komparasi solusi.
-5. **Rekaman Live Class** — Panduan acuan materi utama untuk mengkonfirmasi syarat dan alur tugas.
-
----
-
-## 📂 Struktur Modul & Projek
-
-Setiap modul projek terletak pada subfolder tersendiri dan dapat diakses melalui antarmuka web masing-masing:
-
-1. **`tugas-front-end-hardcoded`**
-   * *Deskripsi:* Pengembangan antarmuka statis dengan tata letak HTML/CSS kustom yang responsif dan presisi secara visual.
-   * *Lokasi Entry:* `./tugas-front-end-hardcoded/public/index.html`
-
-2. **`tugas-front-end-api-public`**
-   * *Deskripsi:* Aplikasi Front-End dinamis yang mengonsumsi data langsung dari endpoint Public API secara asynchronous.
-   * *Lokasi Entry:* `./tugas-front-end-api-public/public/index.html`
-
-3. **`tugas-back-end-api-local`**
-   * *Deskripsi:* Pengembangan REST API lokal Node.js & Express menggunakan mock storage memori lokal.
-   * *Lokasi Entry:* `./tugas-back-end-api-local/public/index.html`
-
-4. **`tugas-back-end-api-sqlite`**
-   * *Deskripsi:* Layanan API berbasis SQLite terintegrasi seeder data (`seed.js`) untuk database lokal.
-   * *Lokasi Entry:* `./tugas-back-end-api-sqlite/public/index.html`
-
-5. **`eksplorasi front-end-admin-manajemen-halaman-product`**
-   * *Deskripsi:* Halaman antarmuka khusus admin untuk memanajemen data katalog produk (tambah, edit, hapus) yang terhubung ke database lokal SQL / SQLite.
-   * *Lokasi Entry:* `./tugas-back-end-api-sqlite/public/admin.html`
-
----
-
-## ⚙️ Panduan Menjalankan Backend Local SQLite
-
-Aplikasi backend memerlukan lingkungan **Node.js** dan database **SQLite** agar server lokal dan pengisian data (*seeding*) berjalan dengan lancar.
-
-### Prasyarat
-* **Node.js** terinstall di perangkat lokal.
-* Dependencies terinstall (Express, SQLite3 / Better-SQLite3).
-
-### Langkah Eksekusi Perintah Terminal
-
-```bash
-# 1. Buka terminal lalu masuk ke direktori projek backend SQLite
-cd tugas-back-end-api-sqlite
-
-# 2. Install semua modul paket yang dibutuhkan
-npm install
-
-# 3. Jalankan Seeder Database (Membuat tabel & data awal)
-node seed.js
-
-# 4. Jalankan Server API Backend Utama
-node server.js
+```text
+├── dokumentasi-program-berjalan/       # Folder penyimpanan screenshot hasil pengujian
+├── tugas-front-end-hardcoded/
+│   └── public/
+│       ├── assets/                     # Aset gambar produk lokal
+│       ├── index.html                  # Halaman produk detail (Hardcoded)
+│       ├── script.js                   # Logika DOM, variasi, stok per variasi & keranjang
+│       └── style.css                   # Styling halaman hardcoded
+├── tugas-front-end-api-public/
+│   └── public/
+│       ├── assets/                     # Aset pendukung
+│       ├── index.html                  # Halaman produk detail (API-Driven)
+│       ├── script.js                   # Logika Fetch API, loading/error state, validasi & keranjang
+│       └── style.css                   # Styling halaman API-driven
+└── README.md
 ```
 
-Server backend akan secara aktif berjalan di `http://localhost:3000`.
+### Rincian Sumber Data
+
+1. **Halaman Produk Hardcoded (`tugas-front-end-hardcoded/public/index.html`)**
+   - Menampilkan produk **Innoxa Unica AJ** menggunakan data lokal (_hardcoded_).
+   - Menyediakan pilihan variasi kapasitas (**50 ml** seharga `$94.30` dengan stok `10`, dan **100 ml** seharga `$150.88` dengan stok `5`) yang dikelola secara independen per variasi.
+2. **Halaman Produk API-Driven (`tugas-front-end-api-public/public/index.html`)**
+   - Mengambil data produk secara _asynchronous_ menggunakan Fetch API dari endpoint _baseline_ **DummyJSON** (`https://dummyjson.com/products/{id}`).
+   - Memetakan metadata produk (`title`, `brand`, `category`, `description`, `price`, `discountPercentage`, `rating`, `stock`, `images`, `sku`, informasi garansi/pengiriman/retur, serta ulasan pelanggan) langsung ke DOM.
+   - Menggunakan nilai `stock` total langsung dari API tanpa mengasumsikan pembagian stok per variasi.
 
 ---
 
-## 📸 Dokumentasi Pengujian Program (Bukti Berjalan)
+## 2. Teknologi & Library yang Digunakan
 
-Seluruh tangkapan layar bukti pengujian tersimpan di folder `dokumentasi-program-berjalan/`:
-
-* **SS-01:** Dokumentasi Tampilan & Fitur Hardcoded (`dokumentasi-hardcoded.png`)
-* **SS-02:** Pengujian Integrasi Public API Async (`dokumentasi-publik-api.png`)
-* **SS-03:** Pengujian Response Server Backend Local (`dokumentasi-lokal-api.png`)
-* **SS-04:** Eksekusi Seed.js & Database SQLite (`dokumentasi-sql.png`)
-* **SS-05:** Pengujian Halaman Admin Manajemen Product (`dokumentasi-admin.png`)
-* **SS-06:** Pengujian Posting Produk dari Halaman Admin (`dokumentasi-input-admin.png`)
+- **HTML5 & CSS3 / Tailwind CSS (CDN)**
+- **JavaScript (Vanilla ES6+)** — `addEventListener`, `textContent`, `async/await`, `Fetch API`, dan `AbortController`
+- **Lodash 4.18.1 (CDN)** — digunakan untuk pembulatan kalkulasi harga (`_.round`) dan sanitasi teks tampilan (`_.escape`)
+- **Font Awesome 6.4.0 & Google Fonts (Inter & Playfair Display)**
 
 ---
 
-## 📩 Feedback & Masukan
+## 3. Fitur Interaksi & Asynchronous Handling
 
-Kritik dan saran pembangunan dapat dikirimkan langsung melalui form interaktif pada landing page portal (`landing_page_README_portal_projek.html`) yang terintegrasi dengan tautan langsung ke WhatsApp.
+### A. Interaksi DOM & Validasi (Kedua Halaman)
+
+- **Pemilihan Variasi & Kalkulasi Subtotal Real-Time**: Mengubah variasi kapasitas (pada halaman _hardcoded_) atau mengubah jumlah (_quantity_) langsung memperbarui harga satuan dan **Order Subtotal** pada ringkasan pesanan menggunakan `textContent`.
+- **Validasi Quantity Ketat**:
+  - Hanya menerima **bilangan bulat positif** ($\ge 1$) dan **tidak melebihi sisa stok** yang tersedia.
+  - Menolak input kosong, `0`, bilangan negatif, bilangan pecahan/desimal, serta jumlah di atas stok dengan menampilkan pesan error merah secara langsung dan menonaktifkan tombol **ADD TO CART**.
+- **Keranjang Belanja Lokal (_Local Cart Drawer_)**:
+  - Menambahkan item valid akan memperbarui _badge_ jumlah keranjang (_cart count_), menghitung subtotal keranjang, mengurangi sisa stok yang tersedia untuk pemesanan berikutnya, dan menampilkan notifikasi _toast_.
+  - Mendukung penghapusan item keranjang menggunakan _event delegation_ (`addEventListener`) yang otomatis mengembalikan ketersediaan stok.
+- **Interaksi Pendukung**: Accordion informasi produk (_Description_, _More Information_, _Features & Specs_), _wishlist toggle_, galeri _thumbnail_ (pada halaman API), serta formulir ulasan (_star rating picker_ + validasi input).
+
+### B. Asynchronous JavaScript & Error Handling (`tugas-front-end-api-public/public/index.html`)
+
+- **Loading State**: Menampilkan _banner_ status pemuatan dan _skeleton loader_ pada gambar, merek, dan judul selama proses `fetch` berlangsung.
+- **Validasi HTTP & Penanganan Error (`response.ok`)**: Memeriksa `response.ok` sebelum mem-parsing `response.json()`. Jika ID produk tidak ditemukan (HTTP 404) atau jaringan bermasalah, seluruh indikator _loading_ dihentikan dan halaman menampilkan **Error State** beserta tombol **Retry**.
+- **Pencegahan Request Duplikat**: Menggunakan `AbortController` untuk membatalkan _request_ sebelumnya apabila pengguna berpindah produk secara cepat, serta memasang seluruh _event listener_ hanya satu kali saat `DOMContentLoaded`.
 
 ---
 
-© 2026 **Ilham Dwi Putranto** — Full-Stack Web Development (AI First Workflow).
+## 4. Cara Menjalankan Proyek
+
+1. _Clone_ atau unduh repository ini ke komputer lokal:
+   ```bash
+   git clone <URL_REPOSITORY_GITHUB_ANDA>
+   cd <NAMA_FOLDER_REPOSITORY>
+   ```
+2. Buka folder proyek menggunakan **Visual Studio Code**.
+3. Jalankan menggunakan ekstensi **Live Server** pada masing-masing folder halaman:
+   - **Halaman Hardcoded**: Klik kanan pada `tugas-front-end-hardcoded/public/index.html` $\rightarrow$ _Open with Live Server_.
+   - **Halaman API-Driven**: Klik kanan pada `tugas-front-end-api-public/public/index.html` $\rightarrow$ _Open with Live Server_.
+   - Pastikan perangkat terhubung ke internet agar CDN Tailwind CSS, Lodash 4.18.1, Font Awesome, dan DummyJSON API dapat dimuat.
+
+---
+
+## 5. Cara Menguji & Tabel Hasil Pengujian
+
+### Langkah Pengujian
+
+1. **Halaman Hardcoded (`tugas-front-end-hardcoded/public/index.html`)**: Ubah variasi kapasitas (`50 ml` / `100 ml`), ubah nilai _quantity_ dengan angka valid maupun tidak valid (`0`, `-2`, `1.5`, `99`), lalu klik **ADD TO CART** dan periksa perubahan _subtotal_, sisa stok per variasi, serta _cart badge_.
+2. **Halaman API-Driven (`tugas-front-end-api-public/public/index.html`)**: Muat halaman awal (Produk `#1`), gunakan tombol panah kiri/kanan di tepi layar untuk berpindah produk, uji input ID tidak valid (misal `9999`) pada kolom **ID Produk** lalu klik **Go** untuk memicu _error state_, dan klik tombol **Retry**.
+
+### Tabel Skenario Pengujian Minimum
+
+| No  | Halaman                                        | Skenario / Input Pengujian                                                    | Expected Result                                                                                                                                     | Actual Result                                                        | Status |
+| :-- | :--------------------------------------------- | :---------------------------------------------------------------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------- | :------------------------------------------------------------------- | :----: |
+| 1   | `tugas-front-end-hardcoded/public/index.html`  | Pilih variasi `100 ml` dan ubah _quantity_ menjadi `2`                        | Harga satuan menjadi `$150.88`, sisa stok `5 available`, dan **Order Subtotal** berubah menjadi `$301.76`                                           | Harga satuan `$150.88`, stok `5 available`, Order Subtotal `$301.76` |  Pass  |
+| 2   | `tugas-front-end-hardcoded/public/index.html`  | Input _quantity_ `0` atau bilangan negatif (`-3`)                             | Muncul pesan error validasi merah, subtotal menjadi `$0.00`, dan tombol **ADD TO CART** nonaktif                                                    | Pesan error muncul & tombol **ADD TO CART** nonaktif                 |  Pass  |
+| 3   | `tugas-front-end-hardcoded/public/index.html`  | Input _quantity_ pecahan/desimal (`1.5`)                                      | Input ditolak dengan pesan error bahwa nilai desimal tidak diizinkan; tombol **ADD TO CART** nonaktif                                               | Input ditolak dengan pesan error & tombol nonaktif                   |  Pass  |
+| 4   | `tugas-front-end-hardcoded/public/index.html`  | Input _quantity_ melebihi stok (`15` pada varian `50 ml` yang stoknya `10`)   | Input ditolak dengan pesan bahwa jumlah melebihi stok maksimum (`10`); tombol **ADD TO CART** nonaktif                                              | Input ditolak dengan pesan batas stok & tombol nonaktif              |  Pass  |
+| 5   | `tugas-front-end-hardcoded/public/index.html`  | Input _quantity_ valid (`3` pada `50 ml`), lalu klik **ADD TO CART**          | _Toast_ sukses muncul, _cart badge_ bertambah menjadi `3`, dan sisa stok `50 ml` berkurang menjadi `7` (stok `100 ml` tetap `5`)                    | _Toast_ muncul, _cart badge_ `3`, sisa stok `50 ml` menjadi `7`      |  Pass  |
+| 6   | `tugas-front-end-api-public/public/index.html` | Buka halaman pertama kali atau klik tombol panah produk selanjutnya           | _Banner_ biru & _skeleton loading_ muncul sementara, lalu data produk dari `dummyjson.com/products/{id}` dirender dan banner hilang setelah 3 detik | _Loading_ tampil lalu data produk API dirender dengan benar          |  Pass  |
+| 7   | `tugas-front-end-api-public/public/index.html` | Masukkan ID produk tidak valid (`9999`) pada input ID Produk lalu klik **Go** | Request gagal (`HTTP 404`), seluruh _skeleton loading_ berhenti/hilang, dan tampil _Error State_ dengan tombol **Retry**                            | _Skeleton_ hilang, tampil kartu _Error State_ & tombol **Retry**     |  Pass  |
+| 8   | `tugas-front-end-api-public/public/index.html` | Klik tombol **Retry** atau **Kembali ke Produk #1** setelah terjadi error     | Melakukan satu kali request ulang, memuat data produk kembali normal tanpa duplikasi _request_ maupun _event listener_                              | Data produk #1 berhasil dimuat ulang tanpa duplikasi                 |  Pass  |
+| 9   | `tugas-front-end-api-public/public/index.html` | Input _quantity_ valid pada produk API lalu klik **ADD TO CART**              | _Subtotal_ terhitung sesuai harga API, _cart badge_ bertambah, dan sisa stok produk berkurang sesuai jumlah yang dibeli                             | _Subtotal_, _cart badge_, dan sisa stok diperbarui sesuai API        |  Pass  |
+
+---
+
+## 6. Bukti Output / Screenshot Browser
+
+_(Simpan file screenshot di folder `dokumentasi-program-berjalan/` lalu sesuaikan nama filenya di bawah ini)_
+
+1. **Halaman Hardcoded (`tugas-front-end-hardcoded/public/index.html`) — Tampilan Produk, Subtotal & Validasi Error:**
+   - `![Screenshot Hardcoded Valid](dokumentasi-program-berjalan/hardcoded-valid.png)`
+   - `![Screenshot Hardcoded Invalid Qty](dokumentasi-program-berjalan/hardcoded-invalid.png)`
+2. **Halaman API-Driven (`tugas-front-end-api-public/public/index.html`) — Loading State & Render Sukses:**
+   - `![Screenshot API Success](dokumentasi-program-berjalan/api-success.png)`
+3. **Halaman API-Driven (`tugas-front-end-api-public/public/index.html`) — Error State (ID 9999) & Tombol Retry:**
+   - `![Screenshot API Error Retry](dokumentasi-program-berjalan/api-error-retry.png)`
+
+---
+
+## 7. Catatan Penggunaan AI
+
+Dalam pengerjaan assignment ini, AI digunakan sebagai asisten _code review_ untuk:
+
+- Memeriksa kesesuaian kode dengan seluruh kriteria pada _Assignment Deliverable Guidelines_ (validasi bilangan bulat positif, pembaruan subtotal menggunakan `textContent`, penggunaan `addEventListener`, dan penanganan `response.ok`).
+- Merapikan struktur penanganan _loading state_, _error state_, dan pencegahan duplikasi _request_ (`AbortController`) pada halaman API-driven.
+- Seluruh kode telah diuji dan diverifikasi secara mandiri pada browser sesuai skenario pengujian di atas.

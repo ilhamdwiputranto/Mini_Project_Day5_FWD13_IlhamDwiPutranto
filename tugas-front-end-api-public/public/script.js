@@ -175,27 +175,11 @@ document.addEventListener("DOMContentLoaded", () => {
       brandEl.classList.remove("hidden");
       titleEl.classList.remove("hidden");
 
-      // Update Banner ke mode Sukses, lalu sembunyikan otomatis setelah 3 detik
-      apiStatusBanner.classList.remove(
-        "hidden",
-        "bg-blue-50",
-        "border-blue-200",
-        "text-blue-900",
-        "bg-red-50",
-        "border-red-200",
-        "text-red-900",
-        "bg-white/80",
-        "border-gray-300",
-        "text-gray-700",
-      );
+      // Update Banner ke mode Sukses
+      apiStatusBanner.classList.remove("bg-blue-50", "border-blue-200", "text-blue-900", "bg-red-50", "border-red-200", "text-red-900");
       apiStatusBanner.classList.add("bg-emerald-50", "border-emerald-200", "text-emerald-900");
       apiStatusIcon.className = "fa-solid fa-circle-check text-emerald-600 text-sm";
       apiStatusText.textContent = `Data produk #${data.id} (${data.title}) berhasil dimuat dari API.`;
-
-      clearTimeout(state.bannerTimeout);
-      state.bannerTimeout = setTimeout(() => {
-        apiStatusBanner.classList.add("hidden");
-      }, 3000);
 
       populateProductDetails();
     } catch (error) {

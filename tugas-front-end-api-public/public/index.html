@@ -159,26 +159,6 @@
         <!-- Left Column: Product Gallery Showcase with Navigation Buttons -->
         <div
           class="lg:col-span-7 flex flex-col items-center justify-center bg-white rounded-2xl p-6 md:p-8 relative border border-gray-300 shadow-inner group">
-          <!-- BACK / PREVIOUS PRODUCT BUTTON -->
-          <button
-            type="button"
-            id="btn-prev-product"
-            class="absolute left-3 md:left-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-black hover:text-white text-black p-3 rounded-full shadow-md z-20 transition-all duration-200 focus:outline-none disabled:opacity-30 disabled:cursor-not-allowed"
-            title="Produk Sebelumnya (Back)"
-            aria-label="Previous Product">
-            <i class="fa-solid fa-chevron-left text-sm md:text-base"></i>
-          </button>
-
-          <!-- NEXT PRODUCT BUTTON -->
-          <button
-            type="button"
-            id="btn-next-product"
-            class="absolute right-3 md:right-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-black hover:text-white text-black p-3 rounded-full shadow-md z-20 transition-all duration-200 focus:outline-none disabled:opacity-30 disabled:cursor-not-allowed"
-            title="Produk Selanjutnya (Next)"
-            aria-label="Next Product">
-            <i class="fa-solid fa-chevron-right text-sm md:text-base"></i>
-          </button>
-
           <span
             id="product-badge"
             class="absolute top-4 left-4 bg-black text-white text-[10px] uppercase tracking-widest px-3 py-1 rounded-full z-10 font-medium opacity-0 transition-opacity duration-300">
@@ -461,6 +441,25 @@
       </section>
     </main>
 
+    <!-- FLOATING NEXT / PREV PRODUCT NAVIGATION (KIRI & KANAN LAYAR) -->
+    <button
+      type="button"
+      id="btn-prev-product"
+      class="fixed left-3 md:left-6 top-1/2 -translate-y-1/2 bg-white/95 hover:bg-black hover:text-white text-black w-11 h-11 md:w-12 md:h-12 rounded-full shadow-lg border border-gray-300 z-30 flex items-center justify-center transition-all duration-200 focus:outline-none disabled:opacity-30 disabled:cursor-not-allowed"
+      title="Produk Sebelumnya (Back)"
+      aria-label="Previous Product">
+      <i class="fa-solid fa-chevron-left text-sm md:text-base"></i>
+    </button>
+
+    <button
+      type="button"
+      id="btn-next-product"
+      class="fixed right-3 md:right-6 top-1/2 -translate-y-1/2 bg-white/95 hover:bg-black hover:text-white text-black w-11 h-11 md:w-12 md:h-12 rounded-full shadow-lg border border-gray-300 z-30 flex items-center justify-center transition-all duration-200 focus:outline-none disabled:opacity-30 disabled:cursor-not-allowed"
+      title="Produk Selanjutnya (Next)"
+      aria-label="Next Product">
+      <i class="fa-solid fa-chevron-right text-sm md:text-base"></i>
+    </button>
+
     <!-- Footer Section -->
     <footer class="bg-brand-dark text-white pt-16 pb-8 border-t border-gray-800 mt-20">
       <div class="max-w-7xl mx-auto px-4 md:px-8">
@@ -626,24 +625,12 @@
       <span id="toast-message">Notification message here.</span>
     </div>
 
-    <!-- ================= START FLOATING BUTTON KEMBALI KE PORTAL ================= -->
-    <a href="../../landing_page_README_portal_projek.html" title="Kembali ke Portal Utama" class="portal-back-btn">
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="20"
-        height="20"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2.5"
-        stroke-linecap="round"
-        stroke-linejoin="round">
-        <path d="m12 19-7-7 7-7" />
-        <path d="M19 12H5" />
-      </svg>
-      <span>Kembali ke Portal</span>
+    <!-- ================= START FLOATING BUTTON SWAP KE HARDCODED ================= -->
+    <a href="../../tugas-front-end-hardcoded/public/index.html" title="Beralih Langsung ke Halaman Hardcoded" class="swap-page-btn">
+      <i class="fa-solid fa-code text-sm"></i>
+      <span>Ke Versi Hardcoded</span>
     </a>
-    <!-- ================= END FLOATING BUTTON KEMBALI KE PORTAL ================= -->
+    <!-- ================= END FLOATING BUTTON SWAP KE HARDCODED ================= -->
 
     <!-- Custom Script -->
     <script src="script.js"></script>
