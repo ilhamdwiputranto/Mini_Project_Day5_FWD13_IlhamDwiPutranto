@@ -4,10 +4,14 @@ document.addEventListener("DOMContentLoaded", () => {
     product: {
       brand: "INNOXA",
       title: "Unica AJ",
-      basePrice: 94.3,
+      variants: {
+        50: { price: 94.3, stock: 10 },
+        100: { price: 150.88, stock: 5 },
+      },
       selectedCapacity: 50,
       currentPrice: 94.3,
       quantity: 1,
+      isValidQty: true,
       isWishlist: false,
     },
     cart: [],
@@ -32,7 +36,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /* --- DOM ELEMENTS --- */
   const priceEl = document.getElementById("product-price");
-  const qtyValEl = document.getElementById("qty-val");
+  const variantLabelEl = document.getElementById("selected-variant-label");
+  const liveSubtotalEl = document.getElementById("live-subtotal");
+  const stockStatusEl = document.getElementById("stock-status");
+  const qtyInputEl = document.getElementById("qty-input");
+  const qtyFeedbackEl = document.getElementById("qty-feedback");
   const btnMinus = document.getElementById("btn-minus");
   const btnPlus = document.getElementById("btn-plus");
   const capacityButtons = document.querySelectorAll(".capacity-pill");
@@ -40,6 +48,91 @@ document.addEventListener("DOMContentLoaded", () => {
   const btnWishlist = document.getElementById("btn-wishlist");
   const toastEl = document.getElementById("toast");
   const toastMsg = document.getElementById("toast-message");
+
+  /* --- HELPER: CALCULATE REMAINING STOCK PER VARIANT --- */
+  function getRemainingStock(capacity = state.product.selectedCapacity) {
+    const variantData = state.product.variants[capacity];
+    const variantLabel = `${capacity} ml`;
+
+    // Hanya menghitung qty di keranjang untuk variasi yang sama
+    const inCartForVariant = state.cart.filter((item) => item.capacity === variantLabel).reduce((sum, item) => sum + item.qty, 0);
+
+    return Math.max(0, variantData.stock - inCartForVariant);
+  }
+
+  /* --- HELPER: UPDATE SUMMARY & SUBTOTAL UI --- */
+  function updateSummaryUI() {
+    const remaining = getRemainingStock();
+    stockStatusEl.textContent =
+      remaining > 0
+        ? `In stock (${remaining} available for ${state.product.selectedCapacity} ml)`
+        : `Out of stock (0 available for ${state.product.selectedCapacity} ml)`;
+
+    variantLabelEl.textContent = `${state.product.selectedCapacity} ml`;
+    priceEl.textContent = `$${state.product.currentPrice.toFixed(2)}`;
+
+    if (state.product.isValidQty) {
+      const subtotal = _.round(state.product.currentPrice * state.product.quantity, 2);
+      liveSubtotalEl.textContent = `$${subtotal.toFixed(2)}`;
+      btnAddToCart.disabled = remaining === 0;
+    } else {
+      liveSubtotalEl.textContent = "$0.00";
+      btnAddToCart.disabled = true;
+    }
+
+    btnMinus.disabled = !state.product.isValidQty || state.product.quantity <= 1;
+    btnPlus.disabled = !state.product.isValidQty || state.product.quantity >= remaining;
+  }
+
+  /* --- QUANTITY VALIDATION LOGIC --- */
+  function validateAndSetQuantity(rawValue) {
+    const remainingStock = getRemainingStock();
+    const trimmed = String(rawValue).trim();
+
+    if (trimmed === "") {
+      setQtyError("Quantity cannot be empty. Enter a positive integer.");
+      return false;
+    }
+
+    const parsed = Number(trimmed);
+
+    if (Number.isNaN(parsed) || !Number.isInteger(parsed)) {
+      setQtyError("Invalid quantity: decimal/fractional values are not allowed.");
+      return false;
+    }
+
+    if (parsed <= 0) {
+      setQtyError("Invalid quantity: must be at least 1 (zero or negative not allowed).");
+      return false;
+    }
+
+    if (remainingStock === 0) {
+      setQtyError(`Out of stock for ${state.product.selectedCapacity} ml variant.`);
+      return false;
+    }
+
+    if (parsed > remainingStock) {
+      setQtyError(`Exceeds available stock! Maximum for ${state.product.selectedCapacity} ml is ${remainingStock}.`);
+      return false;
+    }
+
+    // Valid state
+    state.product.quantity = parsed;
+    state.product.isValidQty = true;
+    qtyFeedbackEl.textContent = "";
+    qtyFeedbackEl.classList.add("hidden");
+    qtyInputEl.classList.remove("text-red-600");
+    updateSummaryUI();
+    return true;
+  }
+
+  function setQtyError(message) {
+    state.product.isValidQty = false;
+    qtyFeedbackEl.textContent = message;
+    qtyFeedbackEl.classList.remove("hidden");
+    qtyInputEl.classList.add("text-red-600");
+    updateSummaryUI();
+  }
 
   /* --- CAPACITY SELECTOR LOGIC --- */
   capacityButtons.forEach((btn) => {
@@ -52,33 +145,39 @@ document.addEventListener("DOMContentLoaded", () => {
       btn.classList.remove("bg-transparent", "text-gray-800", "border-gray-400");
       btn.classList.add("bg-black", "text-white", "border-black");
 
-      state.product.selectedCapacity = parseInt(btn.dataset.capacity);
-      state.product.currentPrice = parseFloat(btn.dataset.price);
+      const selectedCap = parseInt(btn.dataset.capacity, 10);
+      state.product.selectedCapacity = selectedCap;
+      state.product.currentPrice = state.product.variants[selectedCap].price;
 
-      // Update UI Price Display
-      priceEl.textContent = `$${state.product.currentPrice.toFixed(2)}`;
-      showToast(`Updated capacity to ${state.product.selectedCapacity} ml`);
+      // Sesuaikan input quantity terhadap stok variasi yang baru dipilih
+      const remaining = getRemainingStock(selectedCap);
+      qtyInputEl.value = remaining > 0 ? 1 : 0;
+      validateAndSetQuantity(qtyInputEl.value);
+
+      showToast(`Selected variant: ${selectedCap} ml`);
     });
   });
-
-  /* --- QUANTITY CONTROLLER --- */
+  /* --- QUANTITY EVENT LISTENERS --- */
   btnMinus.addEventListener("click", () => {
-    if (state.product.quantity > 1) {
-      state.product.quantity--;
-      updateQtyUI();
+    const current = parseInt(qtyInputEl.value, 10) || 1;
+    if (current > 1) {
+      qtyInputEl.value = current - 1;
+      validateAndSetQuantity(qtyInputEl.value);
     }
   });
 
   btnPlus.addEventListener("click", () => {
-    state.product.quantity++;
-    updateQtyUI();
+    const remaining = getRemainingStock();
+    const current = parseInt(qtyInputEl.value, 10) || 0;
+    if (current < remaining) {
+      qtyInputEl.value = current + 1;
+      validateAndSetQuantity(qtyInputEl.value);
+    }
   });
 
-  function updateQtyUI() {
-    qtyValEl.textContent = state.product.quantity;
-    btnMinus.disabled = state.product.quantity <= 1;
-  }
-  updateQtyUI(); // Initial check
+  qtyInputEl.addEventListener("input", (e) => {
+    validateAndSetQuantity(e.target.value);
+  });
 
   /* --- WISHLIST TOGGLE --- */
   btnWishlist.addEventListener("click", () => {
@@ -87,7 +186,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (state.product.isWishlist) {
       icon.classList.remove("fa-regular");
       icon.classList.add("fa-solid", "text-red-500");
-      showToast("Added to your wishlist ❤️");
+      showToast("Added to your wishlist");
     } else {
       icon.classList.remove("fa-solid", "text-red-500");
       icon.classList.add("fa-regular");
@@ -102,14 +201,14 @@ document.addEventListener("DOMContentLoaded", () => {
       const item = header.parentElement;
       const isOpen = item.classList.contains("active");
 
-      // Optional: Close other accordions
-      document.querySelectorAll(".accordion-item").forEach((i) => i.classList.remove("active"));
+      document.querySelectorAll(".accordion-item").forEach((i) => {
+        i.classList.remove("active");
+        i.querySelector(".accordion-header").setAttribute("aria-expanded", "false");
+      });
 
       if (!isOpen) {
         item.classList.add("active");
         header.setAttribute("aria-expanded", "true");
-      } else {
-        header.setAttribute("aria-expanded", "false");
       }
     });
   });
@@ -140,6 +239,12 @@ document.addEventListener("DOMContentLoaded", () => {
   cartBackdrop.addEventListener("click", () => toggleCart(false));
 
   btnAddToCart.addEventListener("click", () => {
+    // Re-validate before adding to cart
+    if (!validateAndSetQuantity(qtyInputEl.value)) {
+      showToast("Please enter a valid quantity before adding to cart.");
+      return;
+    }
+
     const cartItem = {
       title: `${state.product.brand} ${state.product.title}`,
       capacity: `${state.product.selectedCapacity} ml`,
@@ -147,7 +252,6 @@ document.addEventListener("DOMContentLoaded", () => {
       qty: state.product.quantity,
     };
 
-    // Check existing item
     const existingIndex = state.cart.findIndex((i) => i.capacity === cartItem.capacity);
     if (existingIndex > -1) {
       state.cart[existingIndex].qty += cartItem.qty;
@@ -156,7 +260,12 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     renderCart();
-    showToast(`Added ${state.product.quantity}x Unica AJ (${state.product.selectedCapacity}ml) to cart!`);
+    showToast(`Added ${cartItem.qty}x Unica AJ (${cartItem.capacity}) to cart!`);
+
+    // Reset quantity input to 1 (or 0 if stock depleted) & re-validate against remaining stock
+    const remainingAfterAdd = getRemainingStock();
+    qtyInputEl.value = remainingAfterAdd > 0 ? 1 : 0;
+    validateAndSetQuantity(qtyInputEl.value);
     toggleCart(true);
   });
 
@@ -174,32 +283,45 @@ document.addEventListener("DOMContentLoaded", () => {
     let subtotal = 0;
 
     state.cart.forEach((item, index) => {
-      const itemTotal = item.price * item.qty;
-      subtotal += itemTotal;
+      const itemTotal = _.round(item.price * item.qty, 2);
+      subtotal = _.round(subtotal + itemTotal, 2);
 
       html += `
-                <div class="flex items-center justify-between border-b border-gray-200 pb-3">
-                    <div>
-                        <h4 class="text-xs font-bold text-black">${item.title}</h4>
-                        <p class="text-[11px] text-gray-500">Size: ${item.capacity} | Qty: ${item.qty}</p>
-                        <span class="text-xs font-semibold">$${item.price.toFixed(2)}</span>
-                    </div>
-                    <div class="flex items-center space-x-3">
-                        <span class="text-xs font-bold">$${itemTotal.toFixed(2)}</span>
-                        <button onclick="removeItem(${index})" class="text-gray-400 hover:text-red-500 text-xs"><i class="fa-solid fa-trash"></i></button>
-                    </div>
-                </div>
-            `;
+        <div class="flex items-center justify-between border-b border-gray-200 pb-3">
+          <div>
+            <h4 class="text-xs font-bold text-black">${_.escape(item.title)}</h4>
+            <p class="text-[11px] text-gray-500">Size: ${_.escape(item.capacity)} | Qty: ${item.qty}</p>
+            <span class="text-xs font-semibold">$${item.price.toFixed(2)}</span>
+          </div>
+          <div class="flex items-center space-x-3">
+            <span class="text-xs font-bold">$${itemTotal.toFixed(2)}</span>
+            <button type="button" data-remove-index="${index}" class="remove-cart-item text-gray-400 hover:text-red-500 text-xs" aria-label="Remove item">
+              <i class="fa-solid fa-trash pointer-events-none"></i>
+            </button>
+          </div>
+        </div>
+      `;
     });
 
     cartContainer.innerHTML = html;
     cartSubtotal.textContent = `$${subtotal.toFixed(2)}`;
   }
 
-  window.removeItem = function (index) {
-    state.cart.splice(index, 1);
-    renderCart();
-  };
+  // Event delegation using addEventListener (replaces inline onclick)
+  cartContainer.addEventListener("click", (e) => {
+    const removeBtn = e.target.closest(".remove-cart-item");
+    if (removeBtn) {
+      const index = parseInt(removeBtn.dataset.removeIndex, 10);
+      state.cart.splice(index, 1);
+      renderCart();
+      // Re-validate quantity input against restored stock
+      if (parseInt(qtyInputEl.value, 10) === 0 && getRemainingStock() > 0) {
+        qtyInputEl.value = 1;
+      }
+      validateAndSetQuantity(qtyInputEl.value);
+      showToast("Item removed from cart.");
+    }
+  });
 
   /* --- REVIEW STAR RATING INTERACTION --- */
   const starIcons = document.querySelectorAll("#star-picker i");
@@ -207,7 +329,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   starIcons.forEach((star) => {
     star.addEventListener("click", () => {
-      const rating = parseInt(star.dataset.rating);
+      const rating = parseInt(star.dataset.rating, 10);
       state.selectedRating = rating;
       ratingInput.value = rating;
 
@@ -223,8 +345,40 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  /* --- REVIEW FORM VALIDATION & SUBMISSION --- */
+  /* --- REVIEW LIST RENDER & SUBMISSION --- */
+  const reviewsList = document.getElementById("reviews-list");
   const reviewForm = document.getElementById("review-form");
+
+  function renderInitialReviews() {
+    reviewsList.innerHTML = "";
+    state.reviews.forEach((rev) => addReviewToDOM(rev, false));
+  }
+
+  function addReviewToDOM(review, prepend = true) {
+    let starsHTML = "";
+    for (let i = 1; i <= 5; i++) {
+      starsHTML += i <= review.rating ? '<i class="fa-solid fa-star"></i>' : '<i class="fa-regular fa-star"></i>';
+    }
+
+    const reviewCard = document.createElement("div");
+    reviewCard.className = "bg-white/60 p-5 rounded-xl border border-gray-200 space-y-2";
+    reviewCard.innerHTML = `
+      <div class="flex items-center justify-between">
+        <span class="text-xs font-bold text-black">${_.escape(review.nickname)}</span>
+        <span class="text-[10px] text-gray-400">${_.escape(review.date)}</span>
+      </div>
+      <div class="text-amber-500 text-xs flex">${starsHTML}</div>
+      <h4 class="text-xs font-semibold text-gray-800">${_.escape(review.summary)}</h4>
+      <p class="text-xs text-gray-600 leading-relaxed">${_.escape(review.body)}</p>
+    `;
+
+    if (prepend && reviewsList.firstChild) {
+      reviewsList.insertBefore(reviewCard, reviewsList.firstChild);
+    } else {
+      reviewsList.appendChild(reviewCard);
+    }
+  }
+
   reviewForm.addEventListener("submit", (e) => {
     e.preventDefault();
 
@@ -234,7 +388,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     let isValid = true;
 
-    // Validate Rating
     if (state.selectedRating === 0) {
       document.getElementById("rating-error").classList.remove("hidden");
       isValid = false;
@@ -242,7 +395,6 @@ document.addEventListener("DOMContentLoaded", () => {
       document.getElementById("rating-error").classList.add("hidden");
     }
 
-    // Validate Nickname
     if (!nickname) {
       document.getElementById("nickname-error").classList.remove("hidden");
       isValid = false;
@@ -250,7 +402,6 @@ document.addEventListener("DOMContentLoaded", () => {
       document.getElementById("nickname-error").classList.add("hidden");
     }
 
-    // Validate Summary
     if (!summary) {
       document.getElementById("summary-error").classList.remove("hidden");
       isValid = false;
@@ -258,7 +409,6 @@ document.addEventListener("DOMContentLoaded", () => {
       document.getElementById("summary-error").classList.add("hidden");
     }
 
-    // Validate Body
     if (!body) {
       document.getElementById("body-error").classList.remove("hidden");
       isValid = false;
@@ -267,7 +417,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     if (isValid) {
-      // Append new review
       const newReview = {
         rating: state.selectedRating,
         nickname,
@@ -276,10 +425,10 @@ document.addEventListener("DOMContentLoaded", () => {
         date: "Just now",
       };
 
-      addReviewToDOM(newReview);
+      state.reviews.unshift(newReview);
+      addReviewToDOM(newReview, true);
       reviewForm.reset();
 
-      // Reset Stars
       starIcons.forEach((s) => {
         s.classList.remove("fa-solid", "text-amber-500");
         s.classList.add("fa-regular", "text-gray-400");
@@ -289,28 +438,6 @@ document.addEventListener("DOMContentLoaded", () => {
       showToast("Thank you! Your review has been submitted.");
     }
   });
-
-  function addReviewToDOM(review) {
-    const reviewsList = document.getElementById("reviews-list");
-    let starsHTML = "";
-    for (let i = 1; i <= 5; i++) {
-      starsHTML += i <= review.rating ? '<i class="fa-solid fa-star"></i>' : '<i class="fa-regular fa-star"></i>';
-    }
-
-    const reviewCard = document.createElement("div");
-    reviewCard.className = "bg-white/60 p-5 rounded-xl border border-gray-200 space-y-2 animate-fade-in";
-    reviewCard.innerHTML = `
-            <div class="flex items-center justify-between">
-                <span class="text-xs font-bold text-black">${escapeHTML(review.nickname)}</span>
-                <span class="text-[10px] text-gray-400">${review.date}</span>
-            </div>
-            <div class="text-amber-500 text-xs flex">${starsHTML}</div>
-            <h4 class="text-xs font-semibold text-gray-800">${escapeHTML(review.summary)}</h4>
-            <p class="text-xs text-gray-600 leading-relaxed">${escapeHTML(review.body)}</p>
-        `;
-
-    reviewsList.insertBefore(reviewCard, reviewsList.children[1]);
-  }
 
   /* --- NEWSLETTER FORM VALIDATION --- */
   const newsletterForm = document.getElementById("newsletter-form");
@@ -334,10 +461,12 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   /* --- HELPER FUNCTIONS --- */
+  let toastTimeout;
   function showToast(message) {
     toastMsg.textContent = message;
     toastEl.classList.add("show");
-    setTimeout(() => {
+    clearTimeout(toastTimeout);
+    toastTimeout = setTimeout(() => {
       toastEl.classList.remove("show");
     }, 3000);
   }
@@ -346,7 +475,7 @@ document.addEventListener("DOMContentLoaded", () => {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   }
 
-  function escapeHTML(str) {
-    return str.replace(/[&<>'"]/g, (tag) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" })[tag] || tag);
-  }
+  /* --- INITIALIZE UI --- */
+  renderInitialReviews();
+  updateSummaryUI();
 });
